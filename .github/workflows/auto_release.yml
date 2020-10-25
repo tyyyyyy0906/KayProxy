@@ -29,7 +29,7 @@ jobs:
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
         with:
-          go-version: ^1.15.1
+          go-version: ^1.15.3
         id: go
       - name: get dependencies
         run: |
@@ -38,6 +38,7 @@ jobs:
              curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
              dep ensure
           fi
+          go env
       - name: SSH connection to Actions
         uses: P3TERX/ssh2actions@v1.0.0
         if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
