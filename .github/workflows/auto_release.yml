@@ -1,5 +1,12 @@
 name: release KayProxy
 on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      ssh:
+        description: 'SSH connection to Actions'
+        required: true
+        default: 'false'
   push:
     tags:
       - "0*"
@@ -31,14 +38,12 @@ jobs:
              curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
              dep ensure
           fi
-      - name: executing remote ssh commands using password
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
-          port: ${{ secrets.PORT }}
-          script: whoami
+      - name: SSH connection to Actions
+        uses: P3TERX/ssh2actions@v1.0.0
+        if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
+        env:
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
 
       - name: build
         run: |
@@ -87,7 +92,7 @@ jobs:
            fi
            echo "Building($GOOS-$GOARCH-$suffix)..."
            echo $GOMIPS $GOARM
-           echo CGO_ENABLED=1 $GOARM $GOMIPS GOOS=$GOOS GOARCH=$GOARCH GOPROXY=https://goproxy.io go build -ldflags "-X '$Path.Version=$CurrentVersion' -X '$Path.BuildTime=$BuildTime' -X '$Path.GoVersion=$GoVersion' -X '$Path.GitCommit=$GitCommit' -X '$Path.ExGoVersionInfo=$suffix' -w -s" -o $TargetDir/$output_name
+           echo CGO_ENABLED=0 $GOARM $GOMIPS GOOS=$GOOS GOARCH=$GOARCH GOPROXY=https://goproxy.io go build -ldflags "-X '$Path.Version=$CurrentVersion' -X '$Path.BuildTime=$BuildTime' -X '$Path.GoVersion=$GoVersion' -X '$Path.GitCommit=$GitCommit' -X '$Path.ExGoVersionInfo=$suffix' -w -s" -o $TargetDir/$output_name
            CGO_ENABLED=0 GOOS=$GOOS GOARCH=$GOARCH GOPROXY=https://goproxy.io go build -ldflags "-X '$Path.Version=$CurrentVersion' -X '$Path.BuildTime=$BuildTime' -X '$Path.GoVersion=$GoVersion' -X '$Path.GitCommit=$GitCommit' -X '$Path.ExGoVersionInfo=$suffix' -w -s" -o $TargetDir/$output_name
            if [ $? -ne 0 ]; then
               echo 'An error has occurred! Aborting the script execution...'
