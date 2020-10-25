@@ -31,9 +31,14 @@ jobs:
              curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
              dep ensure
           fi
-      - name: SSH connection to Actions
-        uses: P3TERX/debugger-action@main
-        if: contains(github.event.action, 'ssh')
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          script: whoami
 
       - name: build
         run: |
