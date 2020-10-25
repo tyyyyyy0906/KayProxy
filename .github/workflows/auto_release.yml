@@ -35,7 +35,7 @@ jobs:
         run: |
           CurrentVersion=${{ github.ref }}
           CurrentVersion=${CurrentVersion/'refs/tags/'/''}
-          Project=github.com/Kaytz/UnblockNeteaseMusic
+          Project=github.com/Kaytz/KayProxy
           Path="$Project/version"
           ExecName="KayProxy"
           GitCommit=$(git rev-parse --short HEAD || echo unsupported)
