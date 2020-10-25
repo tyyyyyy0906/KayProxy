@@ -100,17 +100,7 @@ jobs:
           cd key
           ./createCertificate.sh
           cd ..
-          for platform in "${platforms[@]}"; do
-           platform_split=(${platform//\// })
-           buildGo ${platform_split[0]} ${platform_split[1]}
-          done
-          echo "--------------------------------------------"
-          echo "Version:" $CurrentVersion
-          echo "Git commit:" $GitCommit
-          echo "Go version:" $GoVersion
-          echo "Build Time:" $BuildTime
-          echo "Build Finish"
-          echo "--------------------------------------------"
+          ./build.sh
       - name: create release and upload asset
         uses: svenstaro/upload-release-action@v2
         with:
