@@ -33,7 +33,7 @@ func UnGzipV2(gzipData io.Reader) (io.Reader, error) {
 func UnGzip(gzipData []byte) ([]byte, error) {
 	r, err := gzip.NewReader(bytes.NewReader(gzipData))
 	if err != nil {
-		log.Println("UnGzip error:", err,", will return original data")
+		log.Println("UnGzip error:", err, ", will return original data")
 		return gzipData, err
 	}
 	defer r.Close()

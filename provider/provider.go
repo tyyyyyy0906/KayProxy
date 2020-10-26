@@ -3,7 +3,7 @@ package provider
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/itchio/go-brotli/dec"
+	"github.com/dsnet/compress/brotli"
 	"io/ioutil"
 	"kay/KayProxy/common"
 	"kay/KayProxy/provider/jd"
@@ -15,13 +15,13 @@ import (
 	"regexp"
 	"strings"
 )
+
 func JdPrice(httpInfo *common.HttpInfo) bool {
 	return jd.AddPrice(httpInfo)
 }
 func YywOffline(httpInfo *common.HttpInfo) bool {
 	return yyw.YywOffline(httpInfo)
 }
-
 
 func RequiresBodyAfter(response *http.Response, httpInfo *common.HttpInfo) {
 	var appleMethod interface{}
@@ -46,8 +46,17 @@ func RequiresBodyAfter(response *http.Response, httpInfo *common.HttpInfo) {
 					decryptBody, _ = utils.UnGzip(decryptBody)
 				}
 				if strings.Contains(encode, "br") {
-					decryptBody, _ = dec.DecompressBuffer(body, nil)
-					//decryptBody, _ = ioutil.ReadAll(reader)
+					gr, err := brotli.NewReader(bytes.NewReader(decryptBody), nil)
+					if err != nil {
+						panic(err)
+					}
+					gb, gerr := ioutil.ReadAll(gr)
+					if err := gr.Close(); gerr == nil {
+						gerr = err
+					} else if gerr != nil && err == nil {
+						panic("nil on Close after non-nil error")
+					}
+					decryptBody = gb
 				}
 			}
 			result := utils.ParseJson(decryptBody)

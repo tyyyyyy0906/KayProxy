@@ -1,10 +1,12 @@
 package network
 
 import (
+	"bytes"
 	"crypto/tls"
 	"crypto/x509"
 	"flag"
-	"github.com/itchio/go-brotli/dec"
+	"github.com/dsnet/compress/brotli"
+
 	"io"
 	"io/ioutil"
 	"kay/KayProxy/common"
@@ -190,11 +192,13 @@ func GetResponseBody(response *http.Response) ([]byte, error) {
 			}
 		}
 		if strings.Contains(encode, "br") {
-			decryptBody, err = dec.DecompressBuffer(decryptBody, nil)
+			gr, _ := brotli.NewReader(bytes.NewReader(decryptBody), nil)
+			gb, err := ioutil.ReadAll(gr)
 			if err != nil {
 				log.Println("read  body fail")
-				return decryptBody, err
+				return gb, err
 			}
+			decryptBody = gb
 		}
 	}
 	return decryptBody, nil
