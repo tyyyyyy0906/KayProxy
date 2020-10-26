@@ -1,12 +1,12 @@
 name: release KayProxy
 on:
-  repository_dispatch:
-  workflow_dispatch:
-    inputs:
-      ssh:
-        description: 'SSH connection to Actions'
-        required: true
-        default: 'false'
+#   repository_dispatch:
+#   workflow_dispatch:
+#     inputs:
+#       ssh:
+#         description: 'SSH connection to Actions'
+#         required: true
+#         default: 'false'
   push:
     tags:
       - "0*"
@@ -93,10 +93,10 @@ jobs:
            fi
            echo "Building($GOOS-$GOARCH-$suffix)..."
            echo $GOMIPS $GOARM
-           cd /opt/hostedtoolcache/go/1.15.3/x64/src
-           echo CGO_ENABLED=0 GOOS=$GOOS GOARCH=$GOARCH ./make.bash
-           CGO_ENABLED=0 GOOS=$GOOS GOARCH=$GOARCH ./make.bash
-           cd /home/runner/work/KayProxy/KayProxy/
+           #cd /opt/hostedtoolcache/go/1.15.3/x64/src
+           #echo CGO_ENABLED=0 GOOS=$GOOS GOARCH=$GOARCH ./make.bash
+           #CGO_ENABLED=0 GOOS=$GOOS GOARCH=$GOARCH ./make.bash
+           #cd /home/runner/work/KayProxy/KayProxy/
            echo CGO_ENABLED=0 $GOARM $GOMIPS GOOS=$GOOS GOARCH=$GOARCH GOPROXY=https://goproxy.io go build -ldflags "-X '$Path.Version=$CurrentVersion' -X '$Path.BuildTime=$BuildTime' -X '$Path.GoVersion=$GoVersion' -X '$Path.GitCommit=$GitCommit' -X '$Path.ExGoVersionInfo=$suffix' -w -s" -o $TargetDir/$output_name
            CGO_ENABLED=0 GOOS=$GOOS GOARCH=$GOARCH GOPROXY=https://goproxy.io go build -ldflags "-X '$Path.Version=$CurrentVersion' -X '$Path.BuildTime=$BuildTime' -X '$Path.GoVersion=$GoVersion' -X '$Path.GitCommit=$GitCommit' -X '$Path.ExGoVersionInfo=$suffix' -w -s" -o $TargetDir/$output_name
            if [ $? -ne 0 ]; then
